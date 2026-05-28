@@ -3,12 +3,12 @@ using back_end.Models;
 using produtos.Models;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace products.Routes;
 
-public static class PersonRoute {
+public static class PersonRoute
+{
 
-    public static void PersonRoutes (this WebApplication app)
+    public static void PersonRoutes(this WebApplication app)
     {
         var route = app.MapGroup(prefix: "produtos");
 
@@ -27,6 +27,7 @@ public static class PersonRoute {
 
             return Results.Ok(produtosPaginados);
         });
+
         route.MapGet("{id:guid}", async (Guid id, ProdutosContext context) =>
         {
             var produto = await context.estoque
@@ -39,11 +40,19 @@ public static class PersonRoute {
 
             return Results.Ok(produto);
         });
-        route.MapPost("", async (ProdutosRequest req, ProdutosContext context) => 
+
+        route.MapPost("", async (ProdutosRequest req, ProdutosContext context) =>
         {
             if (req.QuantidadeEmEstoque < 0)
             {
                 return Results.BadRequest(new { mensagem = "A quantidade inicial em estoque não pode ser menor que zero." });
+            }
+                       
+            if ((string.Equals(req.Tipo, "eletronico", StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(req.Tipo, "eletrônico", StringComparison.OrdinalIgnoreCase)) &&
+                req.PrecoUnitario < 50)
+            {
+                return Results.BadRequest(new { mensagem = "Para produtos do tipo eletrônico, o valor não poderá ser menor do que R$ 50,00." });
             }
 
             var produto = new ProdutoModel(req.Nome);
@@ -58,6 +67,7 @@ public static class PersonRoute {
 
             return Results.Created($"/produtos/{produto.Id}", produto);
         });
+
         route.MapPut("{id:guid}", async (Guid id, AtualizarProdutoRequest req, ProdutosContext context) =>
         {
             var produtoExistente = await context.Set<ProdutoModel>()
@@ -66,6 +76,13 @@ public static class PersonRoute {
             if (produtoExistente == null)
             {
                 return Results.NotFound(new { mensagem = "Produto não encontrado." });
+            }
+                        
+            if ((string.Equals(req.Tipo, "eletronico", StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(req.Tipo, "eletrônico", StringComparison.OrdinalIgnoreCase)) &&
+                req.PrecoUnitario < 50)
+            {
+                return Results.BadRequest(new { mensagem = "Para produtos do tipo eletrônico, o valor não poderá ser menor do que R$ 50,00." });
             }
 
             if (!string.IsNullOrWhiteSpace(req.Descricao))
@@ -80,15 +97,14 @@ public static class PersonRoute {
 
             return Results.Ok(produtoExistente);
         });
+
         route.MapPatch("{id:guid}/estoque", async (Guid id, int novaQuantidade, ProdutosContext context) =>
         {
-            // 1. VALIDAÇÃO: Bloqueia a execução se a nova quantidade for negativa
             if (novaQuantidade < 0)
             {
                 return Results.BadRequest(new { mensagem = "A quantidade em estoque não pode ser menor que zero." });
             }
 
-            // 2. Busca o produto no banco
             var produtoExistente = await context.Set<ProdutoModel>()
                 .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -97,14 +113,13 @@ public static class PersonRoute {
                 return Results.NotFound(new { mensagem = "Produto não encontrado." });
             }
 
-            // 3. Se passou na validação e o produto existe, atualiza o estoque
             produtoExistente.QuantidadeEmEstoque = novaQuantidade;
 
-            // 4. Salva no banco de dados
             await context.SaveChangesAsync();
 
             return Results.Ok(produtoExistente);
         });
+
         route.MapDelete("{id:guid}", async (Guid id, ProdutosContext context) =>
         {
             var produtoExistente = await context.estoque
@@ -112,7 +127,7 @@ public static class PersonRoute {
 
             if (produtoExistente == null)
             {
-                return Results.NotFound(new { mensaje = "Produto não encontrado." });
+                return Results.NotFound(new { mensagem = "Produto não encontrado." });
             }
 
             produtoExistente.DeletedAt = DateTime.UtcNow;

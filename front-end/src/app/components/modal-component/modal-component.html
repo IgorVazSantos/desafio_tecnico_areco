@@ -1,0 +1,75 @@
+<div *ngIf="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20 backdrop-blur-sm animate-fade-in">
+  
+  <div class="bg-white rounded-lg shadow-2xl w-full max-w-md mx-4 overflow-hidden transform transition-all border border-gray-100">
+    
+    <div class="px-6 py-4 bg-indigo-600 text-white flex justify-between items-center">
+      <h3 class="text-lg font-semibold tracking-wide">Cadastrar Novo Produto</h3>
+      <button (click)="fecharModal()" class="text-white hover:text-indigo-200 text-2xl font-bold transition">&times;</button>
+    </div>
+
+    <form [formGroup]="produtoForm" (ngSubmit)="salvar()" class="p-6 space-y-4">
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Nome do Produto</label>
+        <input type="text" formControlName="nome" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2.5 border" placeholder="Ex: Monitor Gamer 24'">
+        <span *ngIf="produtoForm.get('nome')?.touched && produtoForm.get('nome')?.invalid" class="text-xs text-red-500 mt-1 block">O nome é obrigatório.</span>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Tipo / Categoria</label>
+      <select 
+        formControlName="tipo" 
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2.5 border bg-white">
+    
+        <option value="" disabled selected>Selecione uma categoria...</option>
+    
+        <option *ngFor="let tipo of tiposDeProdutos" [value]="tipo">
+          {{ tipo }}
+        </option>
+      </select>
+
+  <span *ngIf="produtoForm.get('tipo')?.touched && produtoForm.get('tipo')?.invalid" class="text-xs text-red-500 mt-1 block">
+    A categoria do produto é obrigatória.
+  </span>
+</div>
+
+
+    <div>
+            <label class="block text-sm font-medium text-gray-700">Descrição do Produto</label>
+            <textarea 
+                formControlName="descricao" 
+                rows="3" 
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2.5 border" 
+                placeholder="Digite os detalhes ou logs do produto...">
+            </textarea>
+  
+        <span *ngIf="produtoForm.get('descricao')?.touched && produtoForm.get('descricao')?.invalid" class="text-xs text-red-500 mt-1 block">
+            A descrição é obrigatória e não pode ficar vazia.
+        </span>
+    </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Preço Unitário (R$)</label>
+          <input type="number" step="0.01" formControlName="precoUnitario" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2.5 border">
+          <span *ngIf="produtoForm.get('precoUnitario')?.touched && produtoForm.get('precoUnitario')?.invalid" class="text-xs text-red-500 mt-1 block">Insira um valor maior que zero.</span>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Qtd. Inicial Estoque</label>
+          <input type="number" formControlName="quantidadeEmEstoque" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2.5 border">
+          <span *ngIf="produtoForm.get('quantidadeEmEstoque')?.touched && produtoForm.get('quantidadeEmEstoque')?.invalid" class="text-xs text-red-500 mt-1 block">Quantidade inválida.</span>
+        </div>
+      </div>
+
+      <div class="pt-4 flex justify-end space-x-3 border-t border-gray-100 mt-6">
+        <button type="button" (click)="fecharModal()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 text-sm font-medium transition">
+          Cancelar
+        </button>
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm font-medium shadow-md transition">
+          Salvar Produto
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

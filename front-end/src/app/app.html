@@ -1,0 +1,64 @@
+<!-- <pre class="bg-black text-green-400 p-4 rounded mb-4 m-6">
+  Dados na variável: {{ listaDeProdutos | json }}
+</pre> -->
+
+<div class="container mx-auto p-6 bg-gray-50 min-h-screen">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800 tracking-tight">Gestão de Estoque</h1>
+    <button (click)="abrirModalCadastro()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow transition">
+      + Novo Produto
+    </button>
+  </div>
+
+  <div class="bg-white rounded-xl shadow overflow-hidden border border-gray-200">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nome</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tipo</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Preço</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estoque</th>
+          <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200 bg-white">
+        <tr *ngFor="let produto of listaDeProdutos$ | async" class="hover:bg-gray-50 transition">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900">{{ produto.nome }}</div>
+            <div class="text-xs text-gray-500 truncate max-w-xs">{{ produto.descricao }}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+              {{ produto.tipo }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">
+            {{ produto.precoUnitario | currency:'BRL ':'symbol':'1.2-2' }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <span [ngClass]="produto.quantidadeEmEstoque === 0 ? 'text-red-600 font-bold' : 'text-gray-900'">
+              {{ produto.quantidadeEmEstoque }} un.
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
+            <button (click)="prepararEdicao(produto)" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded">Editar</button>
+            <button (click)="eliminarProduto(produto.id!)" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<app-cadastro-produto-modal 
+  [isOpen]="modalCadastroAberto" 
+  (fechar)="fecharModalCadastro()" 
+  (produtoSalvo)="carregarProdutos()"> 
+</app-cadastro-produto-modal>
+
+<app-edicao-produto-modal
+  [isOpen]="modalEdicaoAberto"
+  [produto]="produtoSelecionado"
+  (fechar)="fecharModalEdicao()"
+  (produtoSalvo)="carregarProdutos()">
+</app-edicao-produto-modal>
